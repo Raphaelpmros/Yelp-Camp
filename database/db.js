@@ -1,15 +1,40 @@
 const mysql = require('mysql2');
 
-const con = mysql.createConnection({
+const conConfig = {
   host: 'mysql-db',
   user: 'root',
   password: 'root',
-  database: 'products'
+  database: 'dbYelpCamp'
+};
+
+const con = mysql.createConnection(conConfig);
+
+con.connect((err) => {
+  if (err) {
+    console.error('Erro ao conectar-se ao banco de dados:', err.stack);
+    return;
+  }
+
+  console.log('Conectado ao banco de dados.');
 });
 
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-  });
+const createCampgroundTableSQL = `
+  CREATE TABLE IF NOT EXISTS campground (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    price VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    location VARCHAR(255) NOT NULL
+  );
+`;
+
+con.query(createCampgroundTableSQL, (err, result) => {
+  if (err) {
+    console.error('Erro ao criar tabela campground:', err);
+    return;
+  }
+
+  console.log('Tabela campground criada com sucesso.');
+});
 
 module.exports = con;

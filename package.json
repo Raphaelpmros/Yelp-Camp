@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "start": "nodemon index.js"
+        "start": "sleep infinity"
     },
     "dependencies": {
         "ejs": "^3.1.9",
