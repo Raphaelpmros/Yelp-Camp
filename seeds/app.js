@@ -26,11 +26,12 @@ const seedDB = async () => {
 
     for (let i = 0; i < 50; i++) {
       const random1000 = Math.floor(Math.random() * 1000);
+      const priceRandom = Math.floor(Math.random() * 20) + 10;
       const location = `${cities[random1000].city}, ${cities[random1000].state}`;
       const title = `${sample(descriptors)} ${sample(places)}`;
-      const price = 0;
-      const description = "";
-      const sql = `INSERT INTO campground (title, price, description, location) VALUES ('${title}', '${price}', '${description}', '${location}')`;
+      const price = priceRandom;
+      const description = "dasndjnasidsidnasidnsajdna asjdnaijdnsjidnaijdnjaisnaidnsad nasjidasijdnijdnasjidnaidnifbehbefhuwbfew ibfirgpwfwep oeifjweiofje wfpowejfpwe ofiejfow fjeop";
+      const sql = `INSERT INTO campground (title, price, description, location, image) VALUES ('${title}', '${price}', '${description}', '${location}', 'https://source.unsplash.com/collection/483251')`;
 
       await new Promise((resolve, reject) => {
         con.query(sql, (err, result) => {

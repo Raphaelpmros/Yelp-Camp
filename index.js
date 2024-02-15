@@ -4,12 +4,14 @@ const app = express();
 const path = require("path");
 const con = require("./database/db");
 const methodOverride = require("method-override");
+const ejsMate = require("ejs-mate");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride("_method"));
+app.engine('ejs', ejsMate)
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {

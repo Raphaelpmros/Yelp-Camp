@@ -22,9 +22,10 @@ const createCampgroundTableSQL = `
   CREATE TABLE IF NOT EXISTS campground (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    price VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
     description TEXT NOT NULL,
-    location VARCHAR(255) NOT NULL
+    location VARCHAR(255) NOT NULL,
+    image VARCHAR(255)
   );
 `;
 
