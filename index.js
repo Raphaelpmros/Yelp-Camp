@@ -38,10 +38,10 @@ app.get("/campgrounds/new", (req, res) => {
 
 app.post("/campgrounds", async (req, res) => {
   try {
-    const { title, price, description, location } = req.body;
+    const { title, price, description, location, image } = req.body;
     con.query(
-      "INSERT INTO campground (title, price, description, location) VALUES (?, ?, ?, ?)",
-      [title, price, description, location],
+      "INSERT INTO campground (title, price, description, location, image) VALUES (?, ?, ?, ?, ?)",
+      [title, price, description, location, image],
       function (err, result) {
         if (err) {
           console.error(err);
