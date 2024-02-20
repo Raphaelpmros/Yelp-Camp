@@ -146,8 +146,6 @@ app.post('/campgrounds/:id/reviews', catchAsync(async(req, res, next) => {
   const { id } = req.params;
   const { comment, rating} = req.body;
 
-  console.log('Received review data:', { comment, rating, id });
-
   con.query(
     "INSERT INTO reviews (comment, rating, id_camp) VALUES (?, ?, ?)", 
     [comment, rating, id],
