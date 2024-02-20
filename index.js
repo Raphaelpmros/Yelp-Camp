@@ -61,15 +61,19 @@ app.post("/campgrounds", catchAsync(async (req, res) => {
 }));
 
 app.get("/campgrounds/:id", catchAsync(async (req, res) => {
-    const { id } = req.params;
-    con.query(
-      `SELECT * FROM campground WHERE id = '${id}'`,
-      function (err, result, fields) {
+  const { id } = req.params;
+  con.query(
+    `SELECT * FROM campground WHERE id = '${id}'`,
+    function (err, result, fields) {
+      if (result && result.length > 0) {
         const campground = result[0]; 
         console.log(campground);
         res.render("campgrounds/show", { campground }); 
+      } else {
+        res.status(404).send("Campground not found.");
       }
-    );
+    }
+  );
 }));
 
 app.get("/campgrounds/:id/edit", catchAsync(async (req, res) => {
@@ -138,25 +142,29 @@ app.delete("/campgrounds/:id/", async (req, res) => {
   }
 });
 
-app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+app.post('/campgrounds/:id/reviews', catchAsync(async(req, res, next) => {
   const { id } = req.params;
-  const { body, rating } = req.body.review;
+  const { comment, rating} = req.body;
 
-  try {
-      const insertReviewQuery = 'INSERT INTO reviews (comment, rating) VALUES (?, ?)';
-      const reviewResult = await con.promise().query(insertReviewQuery, [body, rating]);
+  console.log('Received review data:', { comment, rating, id });
 
-      const reviewId = reviewResult[0].insertId;
+  con.query(
+    "INSERT INTO reviews (comment, rating, id_camp) VALUES (?, ?, ?)", 
+    [comment, rating, id],
+    function (err, result) {
+      if (err) {
+        console.error('Error inserting review:', err);
+        res.status(500).send("Erro ao inserir a avaliação no banco de dados.");
+        return;
+      }
 
-      const updateCampgroundQuery = 'UPDATE campgrounds SET reviews = CONCAT(IFNULL(reviews, ""), ?, ",") WHERE id = ?';
-      await con.promise().query(updateCampgroundQuery, [reviewId, id]);
+      console.log('Review inserted successfully:', result);
+      res.redirect(`/campgrounds/${id}`); 
+    }
+  );
+}))
 
-      res.redirect(`/campgrounds/${id}`);
-  } catch (err) {
-      console.error('Erro ao adicionar a avaliação:', err);
-      res.status(500).send('Erro ao adicionar a avaliação');
-  }
-}));
+
 
 con.connect(function (err) {
   if (err) throw err;

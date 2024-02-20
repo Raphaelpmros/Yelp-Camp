@@ -16,7 +16,6 @@ con.connect(function (err) {
         } else {
             console.log('Tabela reviews criada com sucesso');
         }
-        con.end();
     });
 });
 
