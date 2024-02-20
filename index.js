@@ -1,10 +1,15 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const app = express();
+const ExpressError = require('./utils/expressError');
 const path = require("path");
-const con = require("./database/db");
-const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const Joi = require('joi');
+const con = require("./database/db");
+const bodyParser = require("body-parser");
+const catchAsync = require('./utils/catchAsync');
+const methodOverride = require("method-override");
+const reviews = require('./models/review');
+
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -12,6 +17,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate)
+
+const validateCampground = (req, res, next) => {
+  const { error } = campgroundSchema.validate(req.body);
+  if (error) {
+      const msg = error.details.map(el => el.message).join(',')
+      throw new ExpressError(msg, 400)
+  } else {
+      next();
+  }
+}
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
@@ -36,54 +51,28 @@ app.get("/campgrounds/new", (req, res) => {
   res.render("campgrounds/new");
 });
 
-app.post("/campgrounds", async (req, res) => {
-  try {
+app.post("/campgrounds", catchAsync(async (req, res) => {
     const { title, price, description, location, image } = req.body;
     con.query(
       "INSERT INTO campground (title, price, description, location, image) VALUES (?, ?, ?, ?, ?)",
       [title, price, description, location, image],
-      function (err, result) {
-        if (err) {
-          console.error(err);
-          res.status(500).send("Erro ao salvar o produto no banco de dados.");
-          return;
-        }
-        res.redirect("/campgrounds");
-      }
+        res.redirect(`/campgrounds/${campground.id}`),
     );
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro interno do servidor.");
-  }
-});
+}));
 
-app.get("/campgrounds/:id", async (req, res) => {
-  try {
+app.get("/campgrounds/:id", catchAsync(async (req, res) => {
     const { id } = req.params;
     con.query(
       `SELECT * FROM campground WHERE id = '${id}'`,
       function (err, result, fields) {
-        if (err) {
-          console.log(err);
-          res.status(500).send("Internal Server Error");
-          return;
-        }
-        if (result.length === 0) {
-          res.status(404).send("Campground not found");
-          return;
-        }
         const campground = result[0]; 
         console.log(campground);
         res.render("campgrounds/show", { campground }); 
       }
     );
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal Server Error");
-  }
-});
+}));
 
-app.get("/campgrounds/:id/edit", async (req, res) => {
+app.get("/campgrounds/:id/edit", catchAsync(async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -109,7 +98,7 @@ app.get("/campgrounds/:id/edit", async (req, res) => {
     console.error(err);
     res.status(500).send("Erro interno do servidor.");
   }
-});
+}));
 
 app.post("/campgrounds/:id/edit", async (req, res) => {
   try {
@@ -149,10 +138,40 @@ app.delete("/campgrounds/:id/", async (req, res) => {
   }
 });
 
+app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { body, rating } = req.body.review;
+
+  try {
+      const insertReviewQuery = 'INSERT INTO reviews (comment, rating) VALUES (?, ?)';
+      const reviewResult = await con.promise().query(insertReviewQuery, [body, rating]);
+
+      const reviewId = reviewResult[0].insertId;
+
+      const updateCampgroundQuery = 'UPDATE campgrounds SET reviews = CONCAT(IFNULL(reviews, ""), ?, ",") WHERE id = ?';
+      await con.promise().query(updateCampgroundQuery, [reviewId, id]);
+
+      res.redirect(`/campgrounds/${id}`);
+  } catch (err) {
+      console.error('Erro ao adicionar a avaliação:', err);
+      res.status(500).send('Erro ao adicionar a avaliação');
+  }
+}));
+
 con.connect(function (err) {
   if (err) throw err;
   console.log("Connected to database");
 });
+
+app.all('*', (req, res, next) => {
+  next(new ExpressError('Page Not Found', 404))
+})
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500 } = err;
+  if (!err.message) err.message = 'Oh No, Something Went Wrong!'
+  res.status(statusCode).render('error', { err })
+})
 
 app.listen(3000, () => {
   console.log("listenning on port 3000");
