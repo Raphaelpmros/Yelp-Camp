@@ -64,17 +64,28 @@ app.get("/campgrounds/:id", catchAsync(async (req, res) => {
   const { id } = req.params;
   con.query(
     `SELECT * FROM campground WHERE id = '${id}'`,
-    function (err, result, fields) {
-      if (result && result.length > 0) {
-        const campground = result[0]; 
-        console.log(campground);
-        res.render("campgrounds/show", { campground }); 
+    function (err, campgroundResult, fields) {
+      if (campgroundResult && campgroundResult.length > 0) {
+        const campground = campgroundResult[0]; 
+        con.query(
+          `SELECT * FROM reviews WHERE id_camp = '${id}'`,
+          function (err, reviewsResult, fields) {
+            if (reviewsResult) {
+              const reviews = reviewsResult;
+              console.log(campground);
+              res.render("campgrounds/show", { campground, reviews }); 
+            } else {
+              res.status(404).send("Reviews not found for this campground.");
+            }
+          }
+        );
       } else {
         res.status(404).send("Campground not found.");
       }
     }
   );
 }));
+
 
 app.get("/campgrounds/:id/edit", catchAsync(async (req, res) => {
   try {
@@ -161,6 +172,18 @@ app.post('/campgrounds/:id/reviews', catchAsync(async(req, res, next) => {
     }
   );
 }))
+
+app.delete("/campgrounds/:id/reviews/:reviewId", async (req, res) => {
+  try {
+    const { id, reviewId } = req.params;
+    con.query(`DELETE FROM reviews WHERE id = ${reviewId}`, function (err) {
+      if (err) throw err;
+      res.redirect(`/campgrounds/${id}`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 
 
