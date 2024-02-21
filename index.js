@@ -144,6 +144,10 @@ app.post("/campgrounds/:id/edit", async (req, res) => {
 app.delete("/campgrounds/:id/", async (req, res) => {
   try {
     const { id } = req.params;
+    con.query(`DELETE FROM reviews WHERE id_camp = ${id}`, function (err) {
+      if (err) throw err;
+    })
+
     con.query(`DELETE FROM campground WHERE id = ${id}`, function (err) {
       if (err) throw err;
       res.redirect("/campgrounds");
