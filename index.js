@@ -9,14 +9,25 @@ const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 const campgrounds = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
+const session = require('express-session');
 
+app.engine("ejs", ejsMate);
+app.use(bodyParser.json());
 app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, 'public')));
-app.engine("ejs", ejsMate);
+
+app.use("/campgrounds", campgrounds);
+app.use("/campgrounds/:id/reviews", reviewsRoutes);
+
+const sessionConfig = {
+  secret: 'thisshoudbeabettersecret',
+  resave: false,
+  saveUnitialized: true 
+}
+app.use(session(sessionConfig))
 
 const validateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
@@ -41,9 +52,6 @@ const validateCampground = (req, res, next) => {
 app.get("/", (req, res) => {
   res.render("home");
 });
-
-app.use("/campgrounds", campgrounds);
-app.use("/campgrounds/:id/reviews", reviewsRoutes);
 
 con.connect(function (err) {
   if (err) throw err;
