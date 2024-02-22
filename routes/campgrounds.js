@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const catchAsync = require('../utils/catchAsync');
-const ExpressError = require('../utils/expressError');
+const catchAsync = require("../utils/catchAsync");
+const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
-
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
