@@ -10,6 +10,7 @@ const methodOverride = require("method-override");
 const campgrounds = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const session = require('express-session');
+const flash = require('connect-flash')
 
 app.engine("ejs", ejsMate);
 app.use(bodyParser.json());
@@ -19,15 +20,18 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use("/campgrounds", campgrounds);
-app.use("/campgrounds/:id/reviews", reviewsRoutes);
-
 const sessionConfig = {
-  secret: 'thisshoudbeabettersecret',
+  secret: 'thisshouldbeabettersecret!',
   resave: false,
-  saveUnitialized: true 
+  saveUninitialized: true,
+  cookie: {
+      httpOnly: true,
+      expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7
+  }
 }
-app.use(session(sessionConfig))
+app.use(session(sessionConfig));
+app.use(flash());
 
 const validateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
@@ -38,6 +42,15 @@ const validateCampground = (req, res, next) => {
     next();
   }
 };
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
+})
+
+app.use("/campgrounds", campgrounds);
+app.use("/campgrounds/:id/reviews", reviewsRoutes);
 
 // const validateReview = ((req, res, next) => {
 //   const { error } = reviewSchema.validate(req.body);

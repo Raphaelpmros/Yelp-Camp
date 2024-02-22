@@ -22,7 +22,7 @@ router.post(
           return;
         }
 
-        console.log("Review inserted successfully:", result);
+        req.flash('success', 'Successfully created a new review!')
         res.redirect(`/campgrounds/${id}`);
       }
     );
@@ -34,6 +34,7 @@ router.delete("/:reviewId", async (req, res) => {
     const { id, reviewId } = req.params;
     con.query(`DELETE FROM reviews WHERE id = ${reviewId}`, function (err) {
       if (err) throw err;
+      req.flash('success', 'Successfully deleted the review!')
       res.redirect(`/campgrounds/${id}`);
     });
   } catch (err) {

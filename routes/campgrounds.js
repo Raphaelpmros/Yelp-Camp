@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
   res.render("campgrounds/index", { campgrounds });
 });
 
-router.get("/campgrounds/new", (req, res) => {
+router.get("/new", (req, res) => {
   res.render("campgrounds/new");
 });
 
@@ -30,7 +30,15 @@ router.post(
     con.query(
       "INSERT INTO campground (title, price, description, location, image) VALUES (?, ?, ?, ?, ?)",
       [title, price, description, location, image],
-      res.redirect(`/campgrounds/${campground.id}`)
+      function (err, result) {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Erro ao cadastrar o acampamento.");
+        }
+        const campground = result.insertId; // Define campground here
+        req.flash("success", "Successfully made a new campground!");
+        res.redirect(`/campgrounds/${campground}`);
+      }
     );
   })
 );
@@ -57,7 +65,8 @@ router.get(
             }
           );
         } else {
-          res.status(404).send("Campground not found.");
+          req.flash("error", "Cannot find this campground");
+          res.redirect("/campgrounds");
         }
       }
     );
@@ -75,12 +84,14 @@ router.get(
         function (err, result) {
           if (err) {
             console.error(err);
-            res.status(500).send("Erro ao buscar o produto no banco de dados.");
+            req.flash("error", "Cannot find this campground");
+            res.redirect("/campgrounds");
             return;
           }
 
           if (result.length === 0) {
-            res.status(404).send("Produto não encontrado.");
+            req.flash("error", "Cannot find this campground");
+            res.redirect("/campgrounds");
             return;
           }
 
@@ -111,7 +122,7 @@ router.post("/:id/edit", async (req, res) => {
             .send("Erro ao atualizar o produto no banco de dados.");
           return;
         }
-
+        req.flash("success", "Successfully edited the campground!");
         res.redirect("/campgrounds");
       }
     );
@@ -130,6 +141,7 @@ router.delete("/:id/", async (req, res) => {
 
     con.query(`DELETE FROM campground WHERE id = ${id}`, function (err) {
       if (err) throw err;
+      req.flash("success", "Successfully deleted the campground!");
       res.redirect("/campgrounds");
     });
   } catch (err) {
