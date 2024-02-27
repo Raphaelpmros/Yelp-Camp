@@ -2,15 +2,18 @@ const express = require("express");
 const app = express();
 const ExpressError = require("./utils/expressError");
 const path = require("path");
-const ejsMate = require("ejs-mate");
-const Joi = require("joi");
 const con = require("./database/db");
 const bodyParser = require("body-parser");
+const ejsMate = require("ejs-mate");
+const flash = require('connect-flash');
+const session = require('express-session');
 const methodOverride = require("method-override");
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+
 const campgrounds = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
-const session = require('express-session');
-const flash = require('connect-flash')
+const users = require("./routes/users");
 
 app.engine("ejs", ejsMate);
 app.use(bodyParser.json());
@@ -33,17 +36,11 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use((req, res, next) => {
+  res.locals.loggin = req.user;
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   next();
@@ -51,20 +48,7 @@ app.use((req, res, next) => {
 
 app.use("/campgrounds", campgrounds);
 app.use("/campgrounds/:id/reviews", reviewsRoutes);
-
-// const validateReview = ((req, res, next) => {
-//   const { error } = reviewSchema.validate(req.body);
-//   if(error){
-//     const msg = error.details.map(el => el.message).join(',')
-//     throw new ExpressError(msg, 400)
-//   } else {
-//     next()
-//   }
-// })
-
-app.get("/", (req, res) => {
-  res.render("home");
-});
+app.use('/', users)
 
 con.connect(function (err) {
   if (err) throw err;
