@@ -3,6 +3,7 @@ const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
+const { isLoggin } = require("../middleware");
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
@@ -19,7 +20,7 @@ router.get("/", async (req, res) => {
   res.render("campgrounds/index", { campgrounds });
 });
 
-router.get("/new", (req, res) => {
+router.get("/new", isLoggin, (req, res) => {
   res.render("campgrounds/new");
 });
 
@@ -75,7 +76,7 @@ router.get(
 
 router.get(
   "/:id/edit",
-  catchAsync(async (req, res) => {
+  catchAsync(isLoggin, async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -132,7 +133,7 @@ router.post("/:id/edit", async (req, res) => {
   }
 });
 
-router.delete("/:id/", async (req, res) => {
+router.delete("/:id/", isLoggin, async (req, res) => {
   try {
     const { id } = req.params;
     con.query(`DELETE FROM reviews WHERE id_camp = ${id}`, function (err) {
