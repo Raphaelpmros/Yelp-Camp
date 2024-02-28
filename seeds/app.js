@@ -31,7 +31,7 @@ const seedDB = async () => {
       const title = `${sample(descriptors)} ${sample(places)}`;
       const price = priceRandom;
       const description = "dasndjnasidsidnasidnsajdna asjdnaijdnsjidnaijdnjaisnaidnsad nasjidasijdnijdnasjidnaidnifbehbefhuwbfew ibfirgpwfwep oeifjweiofje wfpowejfpwe ofiejfow fjeop";
-      const sql = `INSERT INTO campground (title, price, description, location, image) VALUES ('${title}', '${price}', '${description}', '${location}', 'https://source.unsplash.com/collection/483251')`;
+      const sql = `INSERT INTO campground (title, price, description, location, image, author) VALUES ('${title}', '${price}', '${description}', '${location}', 'https://source.unsplash.com/collection/483251', 2)`;
 
       await new Promise((resolve, reject) => {
         con.query(sql, (err, result) => {

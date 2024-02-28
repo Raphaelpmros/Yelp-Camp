@@ -47,32 +47,58 @@ router.post(
 router.get(
   "/:id",
   catchAsync(async (req, res) => {
-    const { id } = req.params;
-    con.query(
-      `SELECT * FROM campground WHERE id = '${id}'`,
-      function (err, campgroundResult, fields) {
-        if (campgroundResult && campgroundResult.length > 0) {
-          const campground = campgroundResult[0];
-          con.query(
-            `SELECT * FROM reviews WHERE id_camp = '${id}'`,
-            function (err, reviewsResult, fields) {
-              if (reviewsResult) {
-                const reviews = reviewsResult;
-                console.log(campground);
-                res.render("campgrounds/show", { campground, reviews });
-              } else {
-                res.status(404).send("Reviews not found for this campground.");
+    try {
+      const { id } = req.params;
+
+      // Consulta para obter os detalhes do acampamento
+      con.query(
+        `SELECT campground.*, author.username 
+         FROM campground 
+         JOIN user AS author ON campground.author = author.id 
+         WHERE campground.id = '${id}'`,
+        function (err, campgroundResult, fields) {
+          if (err) {
+            console.error(err);
+            req.flash("error", "Something went wrong");
+            res.redirect("/campgrounds");
+            return;
+          }
+
+          // Verificar se o acampamento foi encontrado
+          if (campgroundResult && campgroundResult.length > 0) {
+            const campground = campgroundResult[0];
+
+            // Consulta para obter as avaliações do acampamento
+            con.query(
+              `SELECT * FROM reviews WHERE id_camp = '${id}'`,
+              function (err, reviewsResult, fields) {
+                if (err) {
+                  console.error(err);
+                  req.flash("error", "Something went wrong");
+                  res.redirect("/campgrounds");
+                  return;
+                }
+
+                // Passar os resultados para o modelo
+                const reviews = reviewsResult || [];
+                const username = campground.username;
+                res.render("campgrounds/show", { campground, reviews, username });
               }
-            }
-          );
-        } else {
-          req.flash("error", "Cannot find this campground");
-          res.redirect("/campgrounds");
+            );
+          } else {
+            req.flash("error", "Cannot find this campground");
+            res.redirect("/campgrounds");
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.error(err);
+      req.flash("error", "Something went wrong");
+      res.redirect("/campgrounds");
+    }
   })
 );
+
 
 router.get(
   "/:id/edit",
