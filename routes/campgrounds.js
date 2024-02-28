@@ -76,7 +76,7 @@ router.get(
 
 router.get(
   "/:id/edit",
-  catchAsync(isLoggin, async (req, res) => {
+  catchAsync(async (req, res) => {
     try {
       const { id } = req.params;
 

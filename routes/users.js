@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy;
 const salts = 10
+const { storeReturnTo } = require('../middleware');
 
 
 router.get('/register', (req, res) => {
@@ -70,12 +71,13 @@ passport.serializeUser(function(user, done) {
     }
 }));
 
-router.post('/login', passport.authenticate('local', {
+router.post('/login', storeReturnTo, passport.authenticate('local', {
     failureFlash: true,
     failureRedirect: '/login'
 }), (req, res) => {
     req.flash('sucess', 'Wellcome to yelpCamp')
-    res.redirect('/campgrounds');
+    const redirectUrl = res.locals.returnTo || '/campgrounds';
+    res.redirect(redirectUrl);
 });
 
 router.get('/logout', (req, res) => {
