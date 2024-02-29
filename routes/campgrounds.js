@@ -21,17 +21,17 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/new", isLoggin, (req, res) => {
+  console.log(req.user.id)
   res.render("campgrounds/new");
 });
 
 router.post(
   "/",
+  
   isLoggin,
   catchAsync(async (req, res) => {
     const { title, price, description, location, image } = req.body;
     const id_user = res.locals.user;
-    console.log('aqui')
-    console.log(id_user)
     const author = req.user.id;
     con.query(
       "INSERT INTO campground (title, price, description, location, image, author) VALUES (?, ?, ?, ?, ?, ?)",

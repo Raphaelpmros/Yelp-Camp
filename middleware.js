@@ -1,5 +1,4 @@
 module.exports.isLoggin = (req,res,next)=>{
-    console.log(req.user)
     if (!req.isAuthenticated()){
         req.session.returnTo = req.originalUrl;
         req.flash('error', 'you must  be signed in')
