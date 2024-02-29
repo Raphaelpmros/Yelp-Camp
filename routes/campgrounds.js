@@ -26,11 +26,16 @@ router.get("/new", isLoggin, (req, res) => {
 
 router.post(
   "/",
+  isLoggin,
   catchAsync(async (req, res) => {
     const { title, price, description, location, image } = req.body;
+    const id_user = res.locals.user;
+    console.log('aqui')
+    console.log(id_user)
+    const author = req.user.id;
     con.query(
-      "INSERT INTO campground (title, price, description, location, image) VALUES (?, ?, ?, ?, ?)",
-      [title, price, description, location, image],
+      "INSERT INTO campground (title, price, description, location, image, author) VALUES (?, ?, ?, ?, ?, ?)",
+      [title, price, description, location, image, author],
       function (err, result) {
         if (err) {
           console.error(err);
@@ -82,7 +87,7 @@ router.get(
               }
             );
           } else {
-            req.flash("error", "Cannot find this campground");
+            req.flash("error", "Cannot find this campground 1");
             res.redirect("/campgrounds");
           }
         }

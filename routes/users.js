@@ -62,6 +62,7 @@ passport.serializeUser(function(user, done) {
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (passwordMatch) {
+            console.log(user.id)
             return done(null, user.id);
         } else {
             return done(null, false, { message: 'Senha incorreta.' });
@@ -70,6 +71,23 @@ passport.serializeUser(function(user, done) {
         return done(error);
     }
 }));
+
+router.get('/show', (req, res) => {
+    if (req.user) {
+        con.query('SELECT * FROM user', function(err, result) {
+            if (err) {
+                console.error(err);
+                console.error(err);
+                res.redirect('/error');
+                return;
+            }
+            res.locals.userData = result[0]; 
+            res.render('show');
+        });
+    } else {
+        res.redirect('/campgrounds/show', {user}); 
+}});
+
 
 router.post('/login', storeReturnTo, passport.authenticate('local', {
     failureFlash: true,
