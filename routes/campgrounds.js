@@ -36,7 +36,7 @@ router.post(
           console.error(err);
           return res.status(500).send("Erro ao cadastrar o acampamento.");
         }
-        const campground = result.insertId; // Define campground here
+        const campground = result.insertId;
         req.flash("success", "Successfully made a new campground!");
         res.redirect(`/campgrounds/${campground}`);
       }
@@ -50,7 +50,6 @@ router.get(
     try {
       const { id } = req.params;
 
-      // Consulta para obter os detalhes do acampamento
       con.query(
         `SELECT campground.*, author.username 
          FROM campground 
@@ -64,11 +63,9 @@ router.get(
             return;
           }
 
-          // Verificar se o acampamento foi encontrado
           if (campgroundResult && campgroundResult.length > 0) {
             const campground = campgroundResult[0];
 
-            // Consulta para obter as avaliações do acampamento
             con.query(
               `SELECT * FROM reviews WHERE id_camp = '${id}'`,
               function (err, reviewsResult, fields) {
@@ -79,7 +76,6 @@ router.get(
                   return;
                 }
 
-                // Passar os resultados para o modelo
                 const reviews = reviewsResult || [];
                 const username = campground.username;
                 res.render("campgrounds/show", { campground, reviews, username });
