@@ -122,6 +122,13 @@ router.get(
           }
 
           const campground = result[0];
+
+          if (campground.author !== req.user){
+            req.flash("error", "You don't have permission to access this page");
+            res.redirect("/campgrounds");
+            return;
+          }
+
           res.render("campgrounds/edit", { campground });
         }
       );
