@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
 const { isLoggin } = require("../middleware");
+const user = require("./users")
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
@@ -21,7 +22,6 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/new", isLoggin, (req, res) => {
-  console.log(req.user.id)
   res.render("campgrounds/new");
 });
 
@@ -31,11 +31,9 @@ router.post(
   isLoggin,
   catchAsync(async (req, res) => {
     const { title, price, description, location, image } = req.body;
-    const id_user = res.locals.user;
-    const author = req.user.id;
     con.query(
       "INSERT INTO campground (title, price, description, location, image, author) VALUES (?, ?, ?, ?, ?, ?)",
-      [title, price, description, location, image, author],
+      [title, price, description, location, image, req.user],
       function (err, result) {
         if (err) {
           console.error(err);

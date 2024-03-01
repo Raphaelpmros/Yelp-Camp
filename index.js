@@ -48,7 +48,7 @@ app.use((req, res, next) => {
   next();
 })
 
-app.use("/campgrounds", campgrounds);
+app.use("/campgrounds", campgrounds, users);
 app.use("/campgrounds/:id/reviews", reviewsRoutes);
 app.use('/', users)
 

@@ -19,9 +19,12 @@
                     <li class="list-group-item">$<%= campground.price %>/night</li>
                     <li class="list-group-item">
                         <%= username %>
+                        <%= console.log(username) %>
+                        <%= console.log(currentUser)%>
+                        <%= console.log(campground.author)%>
                     </li>
                 </ul>
-                <% if (currentUser && campground.author === (currentUser.id)) { %>
+                <% if (currentUser && campground.author === (currentUser)) { %>
                 <div class="card-body">
                     <a class="card-link btn btn-info" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
                     <form class="d-inline" action="/campgrounds/<%= campground.id %>?_method=DELETE" method="POST">

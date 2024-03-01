@@ -37,10 +37,10 @@ router.get('/login', (req, res) => {
 });
 
 passport.serializeUser(function(user, done) {
-    done(null, user);
+    return done(null, user);
   });
   passport.deserializeUser(function(user, done) {
-    done(null, user);
+    return done(null, user);
   });
 
 
