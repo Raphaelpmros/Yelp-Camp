@@ -7,13 +7,14 @@ const { isLoggin } = require("../middleware");
 
 router.post(
   "/",
-  catchAsync(isLoggin, async (req, res, next) => {
+  catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const { comment, rating } = req.body;
+    const author = req.user;
 
     con.query(
-      "INSERT INTO reviews (comment, rating, id_camp) VALUES (?, ?, ?)",
-      [comment, rating, id],
+      "INSERT INTO reviews (comment, rating, id_camp, author) VALUES (?, ?, ?, ?)",
+      [comment, rating, id, author],
       function (err, result) {
         if (err) {
           console.error("Error inserting review:", err);
@@ -23,11 +24,12 @@ router.post(
           return;
         }
 
-        req.flash('success', 'Successfully created a new review!')
+        req.flash('success', 'Successfully created a new review!');
         res.redirect(`/campgrounds/${id}`);
       }
     );
-  })
+  }),
+  isLoggin
 );
 
 router.delete("/:reviewId", async (req, res) => {

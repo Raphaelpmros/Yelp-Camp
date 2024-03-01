@@ -19,67 +19,65 @@
                     <li class="list-group-item">$<%= campground.price %>/night</li>
                     <li class="list-group-item">
                         <%= username %>
-                        <%= console.log(username) %>
-                        <%= console.log(currentUser)%>
-                        <%= console.log(campground.author)%>
                     </li>
                 </ul>
-                <% if (currentUser && campground.author === (currentUser)) { %>
-                <div class="card-body">
-                    <a class="card-link btn btn-info" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
-                    <form class="d-inline" action="/campgrounds/<%= campground.id %>?_method=DELETE" method="POST">
-                        <button class="btn btn-danger">Delete</button>
-                    </form>
-                </div>
-                <% } %>
-                <div class="card-body">
-                    <blockquote class="blockquote mb-0"></blockquote>
-                    <footer class="blockquote-footer"><a href="/campgrounds">All
-                            campgrounds</a></footer>
-                    </blockquote>
-                </div>
+                <% if (currentUser && campground.author===(currentUser)) { %>
+                    <div class="card-body">
+                        <a class="card-link btn btn-info" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
+                        <form class="d-inline" action="/campgrounds/<%= campground.id %>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    <% } %>
+                        <div class="card-body">
+                            <blockquote class="blockquote mb-0"></blockquote>
+                            <footer class="blockquote-footer"><a href="/campgrounds">All
+                                    campgrounds</a></footer>
+                            </blockquote>
+                        </div>
             </div>
         </div>
         <div class="col-6">
             <h2>Leave a Review</h2>
             <% if (currentUser){ %>
-            <form action="/campgrounds/<%= campground.id %>/reviews" method="POST" class="mb-3 validated-form"
-                novalidate>
-                <div class="mb-3">
-                    <label class="form-label" for="rating">Rating</label>
-                    <input class="form-range" type="range" min="1" max="5" name="rating" id="rating">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="body">Review</label>
-                    <textarea class="form-control" name="comment" id="body" cols="30" rows="3" required></textarea>
-                    <div class="valid-feedback">
-                        Looks good!
+                <form action="/campgrounds/<%= campground.id %>/reviews" method="POST" class="mb-3 validated-form"
+                    novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="rating">Rating</label>
+                        <input class="form-range" type="range" min="1" max="5" name="rating" id="rating">
                     </div>
-                </div>
-                <button class="btn btn-success">Submit</button>
-            </form>
-            <% } %>
-            <% for (let review of reviews) { %>
-                <div class="card" mb-3>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <p class="card-text">
-                                    Rating: <%= review.rating %>
-                                </p>
-                                <h5 class="card-title">
-                                    Review: <%= review.comment %>
-                                </h5>
-                                <% if (currentUser && reviews.author === (currentUser)) { %>
-                                <form action="/campgrounds/<%=campground.id%>/reviews/<%=review.id%>?_method=DELETE"
-                                    method="POST">
-                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                                <% } %>
-                            </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Review</label>
+                        <textarea class="form-control" name="comment" id="body" cols="30" rows="3" required></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
                         </div>
                     </div>
-                </div>
-                <% }; %>
+                    <button class="btn btn-success">Submit</button>
+                </form>
+                <% } %>
+                    <% for (let review of reviews) { %>
+                        <div class="card mb-3">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Rating: <%= review.rating %>
+                                        </p>
+                                        <h5 class="card-title">
+                                            Review: <%= review.comment %>
+                                        </h5>
+                                        <% if (currentUser && review.author===currentUser) { %>
+                                            <form
+                                                action="/campgrounds/<%=campground.id%>/reviews/<%=review.id%>?_method=DELETE"
+                                                method="POST">
+                                                <button class="btn btn-sm btn-danger">Delete</button>
+                                            </form>
+                                            <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }; %>
         </div>
     </div>
