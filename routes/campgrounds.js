@@ -4,7 +4,6 @@ const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
 const { isLoggin } = require("../middleware");
-const user = require("./users")
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
