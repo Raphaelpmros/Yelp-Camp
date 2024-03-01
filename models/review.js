@@ -8,7 +8,7 @@ con.connect(function (err) {
     
     console.log('Conexão bem-sucedida ao banco de dados');
 
-    var createTableQuery = "CREATE TABLE IF NOT EXISTS reviews (id INT PRIMARY KEY AUTO_INCREMENT, comment VARCHAR(255), rating INT(5), id_camp INT, FOREIGN KEY(id_camp) REFERENCES campground(id))";
+    var createTableQuery = "CREATE TABLE IF NOT EXISTS reviews (id INT PRIMARY KEY AUTO_INCREMENT, comment VARCHAR(255), rating INT(5), id_camp INT, author INT, FOREIGN KEY(id_camp) REFERENCES campground(id), FOREIGN KEY(author) REFERENCES user(id))";
 
     con.query(createTableQuery, function (err, result) {
         if (err) {
@@ -20,8 +20,8 @@ con.connect(function (err) {
 });
 
 function insertReview({ rating, comment, id_camp}, callback) {
-    const sql = 'INSERT INTO reviews (rating, comment, id_camp) VALUES (?, ?, ?)';
-    const values = [rating, comment, id_camp];
+    const sql = 'INSERT INTO reviews (rating, comment, id_camp, author) VALUES (?, ?, ?, ?)';
+    const values = [rating, comment, id_camp, author];
 
     con.query(sql, values, (err, result) => {
         if (err) {

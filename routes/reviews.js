@@ -7,7 +7,7 @@ const { isLoggin } = require("../middleware");
 
 router.post(
   "/",
-  catchAsync(async (req, res, next) => {
+  catchAsync(isLoggin, async (req, res, next) => {
     const { id } = req.params;
     const { comment, rating } = req.body;
 
