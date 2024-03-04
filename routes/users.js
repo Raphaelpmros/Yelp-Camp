@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const con = require('../database/db');
-const bcrypt = require('bcrypt');
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy;
-const salts = 10
 const { storeReturnTo } = require('../middleware');
 const users = require("../controllers/users")
 

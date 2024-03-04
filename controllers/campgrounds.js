@@ -95,18 +95,12 @@ module.exports.editCampgroundForm = async (req, res) => {
     con.query(
       `SELECT * FROM campground WHERE id = '${id}'`,
       function (err, result) {
-        if (err) {
-          console.error(err);
+        if (err || result.length === 0) {
+          console.error(err || "No campground found");
           req.flash("error", "Cannot find this campground");
           res.redirect("/campgrounds");
           return;
-        }
-
-        if (result.length === 0) {
-          req.flash("error", "Cannot find this campground");
-          res.redirect("/campgrounds");
-          return;
-        }
+      }
 
         const campground = result[0];
 
