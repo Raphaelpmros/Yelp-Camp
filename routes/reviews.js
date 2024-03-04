@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
-const { isLoggin } = require("../middleware");
+const { isLoggin, isReviewAuthor } = require("../middleware");
 
 router.post(
   "/",
@@ -32,7 +32,7 @@ router.post(
   isLoggin
 );
 
-router.delete("/:reviewId", async (req, res) => {
+router.delete("/:reviewId", isReviewAuthor ,async (req, res) => {
   try {
     const { id, reviewId } = req.params;
     con.query(`DELETE FROM reviews WHERE id = ${reviewId}`, function (err) {

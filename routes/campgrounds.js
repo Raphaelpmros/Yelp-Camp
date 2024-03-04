@@ -3,7 +3,7 @@ const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
 const ExpressError = require("../utils/expressError");
 const con = require("../database/db");
-const { isLoggin } = require("../middleware");
+const { isLoggin, isAuthor } = require("../middleware");
 
 const allCampgrounds = new Promise((resolve, reject) => {
   con.query("SELECT * FROM campground", function (err, result) {
@@ -100,7 +100,7 @@ router.get(
 
 router.get(
   "/:id/edit",
-  catchAsync(async (req, res) => {
+  isAuthor, catchAsync(async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -116,14 +116,6 @@ router.get(
 
           if (result.length === 0) {
             req.flash("error", "Cannot find this campground");
-            res.redirect("/campgrounds");
-            return;
-          }
-
-          const campground = result[0];
-
-          if (campground.author !== req.user){
-            req.flash("error", "You don't have permission to access this page");
             res.redirect("/campgrounds");
             return;
           }
