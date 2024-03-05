@@ -20,10 +20,12 @@ module.exports.newCampgroundForm = (req, res) => {
 };
 
 module.exports.createCampground = async (req, res) => {
-  const { title, price, description, location, image } = req.body;
+  const images = req.files.map(f => ({url: f.path}))
+  const { title, price, description, location } = req.body;
+  console.log(images);
   con.query(
     "INSERT INTO campground (title, price, description, location, image, author) VALUES (?, ?, ?, ?, ?, ?)",
-    [title, price, description, location, image, req.user],
+    [title, price, description, location, images, req.user],
     function (err, result) {
       if (err) {
         console.error(err);
@@ -31,7 +33,7 @@ module.exports.createCampground = async (req, res) => {
       }
       const campground = result.insertId;
       req.flash("success", "Successfully made a new campground!");
-      res.redirect(`/campgrounds/${campground}`);
+      return res.redirect(`/campgrounds/${campground}`);
     }
   );
 };
