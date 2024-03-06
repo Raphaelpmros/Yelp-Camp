@@ -123,21 +123,35 @@ module.exports.saveEditForm = async (req, res) => {
     const { id } = req.params;
     const { title, price, description, location } = req.body;
 
-    con.query(
-      `UPDATE campground SET title = ?, price = ?, description = ?, location = ? WHERE id = ?`,
-      [title, price, description, location, id],
-      function (err, result) {
-        if (err) {
-          console.error(err);
-          res
-            .status(500)
-            .send("Erro ao atualizar o produto no banco de dados.");
-          return;
-        }
-        req.flash("success", "Successfully edited the campground!");
-        res.redirect("/campgrounds");
+    con.query("SELECT image FROM campground WHERE id = ?", [id], function (err, rows) {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Erro ao recuperar imagens existentes do banco de dados.");
+        return;
       }
-    );
+
+      let existingImages = [];
+      if (rows.length > 0) {
+        existingImages = JSON.parse(rows[0].image);
+      }
+
+      const newImages = req.files.map(f => f.path);
+      const updatedImages = existingImages.concat(newImages);
+
+      con.query(
+        "UPDATE campground SET title = ?, price = ?, description = ?, location = ?, image = ? WHERE id = ?",
+        [title, price, description, location, JSON.stringify(updatedImages), id],
+        function (err, result) {
+          if (err) {
+            console.error(err);
+            res.status(500).send("Erro ao atualizar o registro no banco de dados.");
+            return;
+          }
+          req.flash("success", "Successfully edited the campground!");
+          res.redirect("/campgrounds");
+        }
+      );
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro interno do servidor.");
