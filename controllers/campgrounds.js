@@ -21,13 +21,14 @@ module.exports.newCampgroundForm = (req, res) => {
 
 module.exports.createCampground = async (req, res) => {
   const images = req.files.map(f => f.path);
+  const id_images = req.files.map(f => f.filename);
   const { title, price, description, location } = req.body;
   
   console.log(images);
   
   con.query(
-    "INSERT INTO campground (title, price, description, location, image, author) VALUES (?, ?, ?, ?, ?, ?)",
-    [title, price, description, location, JSON.stringify(images), req.user],
+    "INSERT INTO campground (title, price, description, location, image, author, id_image) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [title, price, description, location, JSON.stringify(images), req.user, JSON.stringify(id_images)],
     function (err, result) {
       if (err) {
         console.error(err);
@@ -136,11 +137,12 @@ module.exports.saveEditForm = async (req, res) => {
       }
 
       const newImages = req.files.map(f => f.path);
+      const id_images = req.files.map(f => f.filename);
       const updatedImages = existingImages.concat(newImages);
 
       con.query(
-        "UPDATE campground SET title = ?, price = ?, description = ?, location = ?, image = ? WHERE id = ?",
-        [title, price, description, location, JSON.stringify(updatedImages), id],
+        "UPDATE campground SET title = ?, price = ?, description = ?, location = ?, image = ?, id_image = ? WHERE id = ?",
+        [title, price, description, location, JSON.stringify(updatedImages), JSON.stringify(id_images), id],
         function (err, result) {
           if (err) {
             console.error(err);

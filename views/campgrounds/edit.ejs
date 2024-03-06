@@ -28,6 +28,31 @@
                 <input type="file" class="form-control" id="image" name="image" multiple>
                 <label class="input-group-text" for="image">select images</label>
             </div>
+            <div class="mb-3">
+                <% if (Array.isArray(campground.image)) { %>
+                    <% campground.image.forEach(function(image, i) { %>
+                        <img src="<%= image %>" class="img-thumbnail" alt="">
+                        <div class="form-check-inline">
+                            <input type="checkbox" name="" id="image-<%=i%>">
+                            <label for="image-<%=i%>">Delete this Image?</label>
+                        </div>
+                        <% }); %>
+                            <% } else { %>
+                                <% try { %>
+                                    <% const images=JSON.parse(campground.image); %>
+                                        <% images.forEach(function(image, i) { %>
+                                            <img src="<%= image %>" class="img-thumbnail" alt="">
+                                            <div class="form-check-inline">
+                                                <input type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=campground.id_image%>>
+                                                <label for="image-<%=i%>">Delete this Image?</label>
+                                            </div>
+                                            <% }); %>
+                                                <% } catch (error) { %>
+                                                    <p>Error parsing image data</p>
+                                                    <% } %>
+                                                        <% } %>
+            </div>
+
             <button class="btn btn-success mb-2">submit</button>
         </form>
         <a class="btn btn-danger" href="/campgrounds">Cancel</a>

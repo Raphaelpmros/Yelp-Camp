@@ -27,7 +27,8 @@ const createCampgroundTableSQL = `
     location VARCHAR(255) NOT NULL,
     image LONGTEXT,
     author INT,
-    FOREIGN KEY(author) REFERENCES user(id)
+    FOREIGN KEY(author) REFERENCES user(id),
+    id_image VARCHAR(255) NOT NULL
   );
 `;
 
