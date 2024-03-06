@@ -25,7 +25,7 @@ const createCampgroundTableSQL = `
     price INT NOT NULL,
     description TEXT NOT NULL,
     location VARCHAR(255) NOT NULL,
-    image VARCHAR(255),
+    image LONGTEXT,
     author INT,
     FOREIGN KEY(author) REFERENCES user(id)
   );

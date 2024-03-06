@@ -1,31 +1,39 @@
 <% layout('layouts/boilerplate') %>
 
-    <h1>All campgrounds</h1>
-    <h3><a href="campgrounds/new">Add a new Campground</a></h3>
+<h1>All campgrounds</h1>
+<h3><a href="campgrounds/new">Add a new Campground</a></h3>
 
-    <% campgrounds.forEach(campground=> { %>
-        <div class="card" mb-3>
-            <div class="row">
-                <div class="col-md-4">
+<% campgrounds.forEach(campground => { %>
+    <div class="card mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <% try { %>
+                    <% const images = JSON.parse(campground.image); %>
+                    <% if (Array.isArray(images) && images.length > 0) { %>
+                        <img class="img-fluid" src="<%= images[0] %>" alt="">
+                    <% } else { %>
+                        <p>No image available</p>
+                    <% } %>
+                <% } catch (error) { %>
                     <img class="img-fluid" src="<%= campground.image %>" alt="">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <%= campground.title %>
-                        </h5>
-                        <p class="card-text">
-                            <%= campground.description %>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <%= campground.location %>
-                            </small>
-                        </p>
-                        <a class="btn btn-primary" href="/campgrounds/<%= campground.id %>">View</a>
-                    </div>
+                <% } %>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%= campground.title %>
+                    </h5>
+                    <p class="card-text">
+                        <%= campground.description %>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <%= campground.location %>
+                        </small>
+                    </p>
+                    <a class="btn btn-primary" href="/campgrounds/<%= campground.id %>">View</a>
                 </div>
             </div>
-            </a>
         </div>
-        <% }); %>
+    </div>
+<% }); %>
