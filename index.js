@@ -56,6 +56,10 @@ app.use("/campgrounds", campgrounds, users);
 app.use("/campgrounds/:id/reviews", reviewsRoutes);
 app.use('/', users)
 
+app.get('/', (req, res) => {
+  res.render('home')
+})
+
 con.connect(function (err) {
   if (err) throw err;
   console.log("Connected to database");
